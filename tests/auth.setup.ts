@@ -6,19 +6,6 @@ dotenv.config();
 const authFile = '.auth/user.json';
 
 setup('Amazon login and save storage state', async ({ page }) => {
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send('WebAuthn.enable');
-  await cdp.send('WebAuthn.addVirtualAuthenticator', {
-    options: {
-      protocol: 'ctap2',
-      transport: 'internal',
-      hasResidentKey: true,
-      hasUserVerification: true,
-      isUserVerified: false,
-      automaticPresenceSimulation: false,
-    },
-  });
-
   await page.goto('/');
 
   const continueShopping = page.getByRole('button', {
