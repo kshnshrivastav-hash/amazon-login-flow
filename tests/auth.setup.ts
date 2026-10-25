@@ -40,11 +40,20 @@ setup('Amazon login and save storage state', async ({ page }) => {
   await emailInput.fill(process.env.AMAZON_EMAIL!);
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  const passwordInput = page.getByRole('textbox', { name: 'Password' });
-  const enterPassword = page
-    .getByRole('link', { name: 'Enter your password' })
-    .or(page.getByRole('button', { name: 'Enter your password' }));
-  const signInButton = page.getByRole('button', { name: 'Sign in' });
+  const passwordInput = page.getByLabel(/password/i);
+  const enterPassword = page.getByRole('button', {
+    name: /enter your password/i,
+  }).or(page.getByRole('link', {
+    name: /enter your password/i,
+  }));
+
+  if (await enterPassword.isVisible().catch(() => false)) {
+    await enterPassword.click();
+  }
+
+  await expect(passwordInput).toBeVisible({ timeout: 15000 });
+
+  const signInButton = page.getByRole('button', { name: /sign in/i });
 
   for (let attempt = 1; attempt <= 3; attempt++) {
     await expect(passwordInput.or(enterPassword)).toBeVisible();
