@@ -21,17 +21,26 @@ export default defineConfig({
       ? { storageState: authFile }
       : {}),
   },
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-      testIgnore: process.env.CI
-        ? [
-            'auth.setup.ts',
-            'session.spec.ts',
-            'amazon-checkout.spec.ts',
-          ]
-        : [],
-    },
-  ],
+  projects: process.env.CI
+    ? [
+        {
+          name: 'setup',
+          testMatch: /auth\.setup\.ts/,
+        },
+        {
+          name: 'chromium',
+          dependencies: ['setup'],
+          testIgnore: ['ci-smoke.spec.ts'],
+          use: {
+            ...devices['Desktop Chrome'],
+            storageState: authFile,
+          },
+        },
+      ]
+    : [
+        {
+          name: 'chromium',
+          use: { ...devices['Desktop Chrome'] },
+        },
+      ],
 });
