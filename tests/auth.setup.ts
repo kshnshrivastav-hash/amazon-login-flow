@@ -38,10 +38,30 @@ setup('Amazon login and save storage state', async ({ page }) => {
   }
 
   const passwordInput = page.locator('input#ap_password');
-  await expect(
-    passwordInput,
-    'Amazon did not display the password field after selecting password sign-in.',
-  ).toBeVisible({ timeout: 15000 });
+  try {
+    await expect(passwordInput).toBeVisible({ timeout: 15000 });
+  } catch (error) {
+    const diagnostics = await page.evaluate(() => ({
+      url: location.href,
+      title: document.title,
+      headings: Array.from(document.querySelectorAll('h1, h2'))
+        .map(el => el.textContent?.trim())
+        .filter(Boolean),
+      buttons: Array.from(document.querySelectorAll('button'))
+        .map(el => el.innerText.trim())
+        .filter(Boolean)
+        .slice(0, 25),
+      passwordInputs: Array.from(
+        document.querySelectorAll('input[type="password"]')
+      ).map(el => ({
+        id: el.id,
+        name: el.getAttribute('name'),
+        visible: !!(el.offsetWidth || el.offsetHeight),
+      })),
+    }));
+    console.error('AMAZON LOGIN PAGE DIAGNOSTICS:', JSON.stringify(diagnostics));
+    throw error;
+  }
 
   await passwordInput.fill(process.env.AMAZON_PASSWORD!);
   await page.getByRole('button', { name: /sign in/i }).click();
