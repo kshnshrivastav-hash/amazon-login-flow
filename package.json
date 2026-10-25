@@ -1,0 +1,16 @@
+{
+  "name": "amazon-login-flow",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "login": "playwright test --project=setup",
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^22.0.0",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.6.0"
+  }
+}
