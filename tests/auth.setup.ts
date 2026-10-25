@@ -40,7 +40,6 @@ setup('Amazon login and save storage state', async ({ page }) => {
   await emailInput.fill(process.env.AMAZON_EMAIL!);
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  const passwordInput = page.getByLabel(/password/i);
   const enterPassword = page.getByRole('button', {
     name: /enter your password/i,
   }).or(page.getByRole('link', {
@@ -51,25 +50,19 @@ setup('Amazon login and save storage state', async ({ page }) => {
     await enterPassword.click();
   }
 
-  await expect(passwordInput).toBeVisible({ timeout: 15000 });
+  const passwordInput = page.locator('input#ap_password');
+  await expect(
+    passwordInput,
+    'Amazon did not display the password field after selecting password sign-in.',
+  ).toBeVisible({ timeout: 15000 });
 
-  const signInButton = page.getByRole('button', { name: /sign in/i });
+  await passwordInput.fill(process.env.AMAZON_PASSWORD!);
+  await page.getByRole('button', { name: /sign in/i }).click();
 
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    await expect(passwordInput.or(enterPassword)).toBeVisible();
-    if (await enterPassword.isVisible()) {
-      await enterPassword.click();
-    }
-    await expect(passwordInput).toBeVisible();
-    await passwordInput.fill(process.env.AMAZON_PASSWORD!);
-    await signInButton.click();
-    await page.waitForLoadState('load');
-
-    await expect(accountLink.or(enterPassword)).toBeVisible();
-    if (await accountLink.isVisible()) {
-      break;
-    }
-  }
+  await expect(
+    accountLink,
+    'Amazon login did not return to a page with the Account & Lists link. Check for verification or another sign-in prompt.',
+  ).toBeVisible({ timeout: 30000 });
 
   await expect(accountLink).not.toContainText(/sign in/i);
 
