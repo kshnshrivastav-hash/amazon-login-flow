@@ -21,7 +21,17 @@ setup('Amazon login and save storage state', async ({ page }) => {
 
   await page.goto('/');
 
+  const continueShopping = page.getByRole('button', {
+    name: /continue shopping/i,
+  });
+
+  if (await continueShopping.isVisible().catch(() => false)) {
+    await continueShopping.click();
+    await page.waitForLoadState('domcontentloaded').catch(() => {});
+  }
+
   const accountLink = page.getByRole('link', { name: /account & lists/i });
+  await expect(accountLink).toBeVisible({ timeout: 15000 });
   await accountLink.click();
   await expect(page).toHaveURL(/\/ap\/signin/);
 
