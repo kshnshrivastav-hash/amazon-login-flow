@@ -52,11 +52,11 @@ setup('Amazon login and save storage state', async ({ page }) => {
         .filter(Boolean)
         .slice(0, 25),
       passwordInputs: Array.from(
-        document.querySelectorAll('input[type="password"]')
+        document.querySelectorAll<HTMLInputElement>('input[type="password"]')
       ).map(el => ({
         id: el.id,
         name: el.getAttribute('name'),
-        visible: !!(el.offsetWidth || el.offsetHeight),
+        visible: el.getClientRects().length > 0,
       })),
     }));
     console.error('AMAZON LOGIN PAGE DIAGNOSTICS:', JSON.stringify(diagnostics));
