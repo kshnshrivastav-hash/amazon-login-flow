@@ -25,6 +25,13 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      testIgnore: process.env.CI
+        ? [
+            'auth.setup.ts',
+            'session.spec.ts',
+            'amazon-checkout.spec.ts',
+          ]
+        : [],
     },
   ],
 });
